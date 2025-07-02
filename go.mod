@@ -13,8 +13,11 @@ require (
 )
 
 require (
+	github.com/mattn/go-runewidth v0.0.16
+	golang.org/x/term v0.32.0
+)
+
+require (
 	github.com/mattn/go-colorable v0.1.13 // indirect
-	github.com/mattn/go-runewidth v0.0.16 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
-	golang.org/x/term v0.32.0 // indirect
 )
