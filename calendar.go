@@ -101,12 +101,24 @@ func (calendar *Calendar) Generate(date time.Time) {
 }
 
 // Show calendar
-func (calendar *Calendar) Show(w io.Writer) {
-	fmt.Fprint(w, calendar.DateHeader+"\n")
-	fmt.Fprint(w, calendar.WeekHeader+"\n")
-	for _, element := range calendar.Body {
-		fmt.Fprint(w, element+"\n")
-	}
+func (calendar *Calendar) Show(w io.Writer, center bool) {
+	termWidth := getTerminalWidth() // ターミナル幅をここで取得
+
+    if center {
+        // 各行を中央寄せして出力
+        fmt.Fprint(w, centerLine(calendar.DateHeader, termWidth)+"\n")
+        fmt.Fprint(w, centerLine(calendar.WeekHeader, termWidth)+"\n")
+        for _, element := range calendar.Body {
+            fmt.Fprint(w, centerLine(element, termWidth)+"\n")
+        }
+    } else {
+        // center が false の場合は元の表示ロジック
+        fmt.Fprint(w, calendar.DateHeader+"\n")
+        fmt.Fprint(w, calendar.WeekHeader+"\n")
+        for _, element := range calendar.Body {
+            fmt.Fprint(w, element+"\n")
+        }
+    }
 }
 
 // Clear calendar

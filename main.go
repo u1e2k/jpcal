@@ -15,7 +15,7 @@ var (
 	version = "devel"
 )
 
-func showYearCalendar(specifyYear string, w io.Writer) {
+func showYearCalendar(specifyYear string, w io.Writer, center bool) {
 	var calendar Calendar
 
 	year, err := time.Parse("2006", specifyYear)
@@ -29,23 +29,23 @@ func showYearCalendar(specifyYear string, w io.Writer) {
 		calendar.Generate(date)
 
 		if i%3 == 0 {
-			calendar.Show(w)
+			calendar.Show(w, center)
 			calendar.Clear()
 		}
 	}
 }
 
-func showThreeMonthsCalendar(w io.Writer) {
+func showThreeMonthsCalendar(w io.Writer, center bool) {
 	var calendar Calendar
 	date := time.Now()
 
 	calendar.Generate(timeext.BeginningOfMonth(date).AddDate(0, 0, -1))
 	calendar.Generate(date)
 	calendar.Generate(timeext.EndOfMonth(date).AddDate(0, 0, 1))
-	calendar.Show(w)
+	calendar.Show(w, center)
 }
 
-func showOneMonthCalendar(specifyDate string, w io.Writer) {
+func showOneMonthCalendar(specifyDate string, w io.Writer, center bool) {
 	var calendar Calendar
 	var err error
 
@@ -60,10 +60,10 @@ func showOneMonthCalendar(specifyDate string, w io.Writer) {
 	}
 
 	calendar.Generate(date)
-	calendar.Show(w)
+	calendar.Show(w, center)
 }
 
-func showBeforeCalendar(number int, w io.Writer) {
+func showBeforeCalendar(number int, w io.Writer, center bool) {
 	var calendar Calendar
 
 	date := time.Now()
@@ -74,17 +74,17 @@ func showBeforeCalendar(number int, w io.Writer) {
 		date = timeext.EndOfMonth(date).AddDate(0, 0, 1)
 		calendar.Generate(date)
 		if i%3 == 0 {
-			calendar.Show(w)
+			calendar.Show(w, center)
 			calendar.Clear()
 		}
 	}
 
 	if count%3 != 0 {
-		calendar.Show(w)
+		calendar.Show(w, center)
 	}
 }
 
-func showAfterCalendar(number int, w io.Writer) {
+func showAfterCalendar(number int, w io.Writer, center bool) {
 	var calendar Calendar
 	date := time.Now()
 	i := 1
@@ -92,13 +92,13 @@ func showAfterCalendar(number int, w io.Writer) {
 	calendar.Generate(date)
 	for ; i <= number; i++ {
 		if i%3 == 0 {
-			calendar.Show(w)
+			calendar.Show(w, center)
 			calendar.Clear()
 		}
 		date = timeext.EndOfMonth(date).AddDate(0, 0, 1)
 		calendar.Generate(date)
 	}
-	calendar.Show(w)
+	calendar.Show(w, center)
 }
 
 func run(args []string, out, err io.Writer) int {
@@ -108,6 +108,8 @@ func run(args []string, out, err io.Writer) int {
 	var three bool
 	var before int
 	var after int
+	var centerOutput bool
+	var test bool
 
 	specifyYear := strconv.Itoa(time.Now().Year())
 
@@ -119,10 +121,18 @@ func run(args []string, out, err io.Writer) int {
 	flags.BoolVar(&showVersion, "v", false, "show version")
 	flags.IntVar(&before, "B", 0, "Display the number of months before the current month.")
 	flags.IntVar(&after, "A", 0, "Display the number of months after the current month.")
+	flags.BoolVar(&centerOutput, "c", false, "Center the calendar output.") 
+	flags.BoolVar(&test, "t", false, "test mode.")
 	flags.Parse(args[1:])
 
 	if showVersion {
 		fmt.Fprintln(out, "version:", version)
+		return 0
+	}
+
+	if test {
+		width := getTerminalWidth()
+		fmt.Printf("現在のターミナル幅: %d 文字\n", width)
 		return 0
 	}
 
@@ -131,15 +141,15 @@ func run(args []string, out, err io.Writer) int {
 			specifyYear = args[2]
 		}
 
-		showYearCalendar(specifyYear, out)
+		showYearCalendar(specifyYear, out, centerOutput)
 	} else if three {
-		showThreeMonthsCalendar(out)
+		showThreeMonthsCalendar(out, centerOutput)
 	} else if after > 0 {
-		showAfterCalendar(after, out)
+		showAfterCalendar(after, out, centerOutput)
 	} else if before > 0 {
-		showBeforeCalendar(before, out)
+		showBeforeCalendar(before, out, centerOutput)
 	} else {
-		showOneMonthCalendar(specifyDate, out)
+		showOneMonthCalendar(specifyDate, out, centerOutput)
 	}
 
 	return 0
