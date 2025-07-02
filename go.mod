@@ -1,4 +1,4 @@
-module github.com/y-yagi/jpcal
+module github.com/u1e2k/jpcal
 
 go 1.23.0
 
